@@ -1,0 +1,31 @@
+using System.Security.Claims;
+using Csw.Api.Application.DTOs;
+using Csw.Api.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Csw.Api.Controllers;
+
+[ApiController]
+[Route("api/v1/auth")]
+public class AuthController(AuthService authService) : ControllerBase
+{
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest req)
+    {
+        var result = await authService.LoginAsync(req);
+        if (result == null)
+            return Unauthorized(new { error = "Invalid email or password." });
+        return Ok(result);
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> Me()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await authService.GetCurrentUserAsync(userId);
+        if (user == null) return Unauthorized();
+        return Ok(user);
+    }
+}

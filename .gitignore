@@ -1,0 +1,26 @@
+# Environment
+.env
+.env.local
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Node
+node_modules/
+dist/
+.pnp
+.pnp.js
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (local dev)
+postgres_data/
