@@ -9,10 +9,13 @@ namespace Csw.Api.Controllers;
 [ApiController]
 [Route("api/v1/inventory")]
 [Authorize]
-public class InventoryController(InventoryLedgerService svc) : ControllerBase
+public class InventoryController(InventoryLedgerService svc, AuditService audit) : ControllerBase
 {
     private Guid CurrentUserId =>
         Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    private string CurrentUsername =>
+        User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("name") ?? "unknown";
 
     [HttpGet("balances")]
     public async Task<IActionResult> GetBalances([FromQuery] bool? lowStockOnly) =>
@@ -31,25 +34,45 @@ public class InventoryController(InventoryLedgerService svc) : ControllerBase
     [HttpPost("transactions/receipt")]
     [Authorize(Roles = "Administrator,InventoryUser")]
     public async Task<IActionResult> PostReceipt([FromBody] PostReceiptRequest req)
-        => Ok(await svc.PostReceiptAsync(req, CurrentUserId));
+    {
+        var result = await svc.PostReceiptAsync(req, CurrentUserId);
+        await audit.LogAsync("RECEIPT_POST", CurrentUserId, CurrentUsername, "InventoryTransaction", result.Id.ToString(), $"Item:{req.ItemId} Qty:{req.Quantity}");
+        return Ok(result);
+    }
 
     [HttpPost("transactions/consumption")]
     [Authorize(Roles = "Administrator,InventoryUser,ProductionUser")]
     public async Task<IActionResult> PostConsumption([FromBody] PostConsumptionRequest req)
-        => Ok(await svc.PostConsumptionAsync(req, CurrentUserId));
+    {
+        var result = await svc.PostConsumptionAsync(req, CurrentUserId);
+        await audit.LogAsync("CONSUMPTION_POST", CurrentUserId, CurrentUsername, "InventoryTransaction", result.Id.ToString(), $"Item:{req.ItemId} Qty:{req.Quantity}");
+        return Ok(result);
+    }
 
     [HttpPost("transactions/adjustment")]
     [Authorize(Roles = "Administrator,InventoryUser")]
     public async Task<IActionResult> PostAdjustment([FromBody] PostAdjustmentRequest req)
-        => Ok(await svc.PostAdjustmentAsync(req, CurrentUserId));
+    {
+        var result = await svc.PostAdjustmentAsync(req, CurrentUserId);
+        await audit.LogAsync("ADJUSTMENT_POST", CurrentUserId, CurrentUsername, "InventoryTransaction", result.Id.ToString(), $"Item:{req.ItemId} Qty:{req.Quantity} Positive:{req.IsPositive}");
+        return Ok(result);
+    }
 
     [HttpPost("transactions/opening-balance")]
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> PostOpeningBalance([FromBody] PostOpeningBalanceRequest req)
-        => Ok(await svc.PostOpeningBalanceAsync(req, CurrentUserId));
+    {
+        var result = await svc.PostOpeningBalanceAsync(req, CurrentUserId);
+        await audit.LogAsync("OPENING_BALANCE_POST", CurrentUserId, CurrentUsername, "InventoryTransaction", result.Id.ToString(), $"Item:{req.ItemId} Qty:{req.Quantity}");
+        return Ok(result);
+    }
 
     [HttpPost("transactions/{id:guid}/void")]
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> VoidTransaction(Guid id)
-        => Ok(await svc.VoidTransactionAsync(id, CurrentUserId));
+    {
+        var result = await svc.VoidTransactionAsync(id, CurrentUserId);
+        await audit.LogAsync("TRANSACTION_VOID", CurrentUserId, CurrentUsername, "InventoryTransaction", id.ToString());
+        return Ok(result);
+    }
 }

@@ -8,5 +8,7 @@ public record DashboardSummaryDto(
     int LowStockCount,
     int OutOfStockCount,
     int TotalTransactions,
-    int ActiveProductTypes
+    int ActiveProductTypes,
+    int TodayReceipts,
+    int TodayConsumptions
 );

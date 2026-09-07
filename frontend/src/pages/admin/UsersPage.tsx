@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Pencil, UserX } from 'lucide-react'
+import { Plus, Pencil } from 'lucide-react'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { Modal } from '@/components/shared/Modal'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Pagination } from '@/components/shared/Pagination'
 import { usersApi } from '@/api/users'
-import type { AppUser, Role } from '@/types'
+import type { AppUser } from '@/types'
 
 const AVAILABLE_ROLES = ['Administrator', 'InventoryUser', 'ProductionUser', 'ManagementUser']
 
@@ -20,13 +20,33 @@ function UserFormModal({ open, onClose, user }: { open: boolean; onClose: () => 
     roles: user?.roles ?? [] as string[],
     isActive: user?.isActive ?? true,
   })
+  const [error, setError] = useState('')
 
-  const mutation = useMutation({
-    mutationFn: () => isEdit
-      ? usersApi.update(user!.id, { fullName: form.fullName, isActive: form.isActive })
-      : usersApi.create({ email: form.email, fullName: form.fullName, password: form.password, roles: form.roles }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['users'] }); onClose() },
-  })
+  const { data: allRoles } = useQuery({ queryKey: ['roles'], queryFn: usersApi.getRoles })
+  const roleIdByName = Object.fromEntries((allRoles ?? []).map(r => [r.name, r.id]))
+
+  const handleSave = async () => {
+    setError('')
+    try {
+      if (isEdit) {
+        await usersApi.update(user!.id, { fullName: form.fullName, isActive: form.isActive })
+        const prevRoles = user!.roles
+        const toAdd = form.roles.filter(r => !prevRoles.includes(r))
+        const toRemove = prevRoles.filter(r => !form.roles.includes(r))
+        for (const r of toAdd) await usersApi.assignRole(user!.id, r)
+        for (const r of toRemove) {
+          const rid = roleIdByName[r]
+          if (rid) await usersApi.removeRole(user!.id, rid)
+        }
+      } else {
+        await usersApi.create({ email: form.email, fullName: form.fullName, password: form.password, roles: form.roles })
+      }
+      qc.invalidateQueries({ queryKey: ['users'] })
+      onClose()
+    } catch (e: any) {
+      setError(e.message ?? 'Save failed')
+    }
+  }
 
   const toggleRole = (r: string) =>
     setForm(f => ({ ...f, roles: f.roles.includes(r) ? f.roles.filter(x => x !== r) : [...f.roles, r] }))
@@ -51,33 +71,33 @@ function UserFormModal({ open, onClose, user }: { open: boolean; onClose: () => 
               <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Roles</label>
-              <div className="space-y-1">
-                {AVAILABLE_ROLES.map(r => (
-                  <label key={r} className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="checkbox" checked={form.roles.includes(r)} onChange={() => toggleRole(r)} />
-                    {r}
-                  </label>
-                ))}
-              </div>
-            </div>
           </>
         )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Roles</label>
+          <div className="space-y-1">
+            {AVAILABLE_ROLES.map(r => (
+              <label key={r} className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={form.roles.includes(r)} onChange={() => toggleRole(r)} />
+                {r}
+              </label>
+            ))}
+          </div>
+        </div>
         {isEdit && (
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={form.isActive} onChange={e => setForm(f => ({ ...f, isActive: e.target.checked }))} />
             Active
           </label>
         )}
-        {mutation.isError && <p className="text-sm text-red-600">{(mutation.error as Error).message}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
         <div className="flex justify-end gap-3 pt-2">
           <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
           <button
-            onClick={() => mutation.mutate()}
-            disabled={!form.fullName || (!isEdit && (!form.email || !form.password)) || mutation.isPending}
+            onClick={handleSave}
+            disabled={!form.fullName || (!isEdit && (!form.email || !form.password))}
             className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50">
-            {mutation.isPending ? 'Saving…' : 'Save'}
+            Save
           </button>
         </div>
       </div>

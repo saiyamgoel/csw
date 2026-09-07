@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Package, ShoppingBag, List, LogOut,
   Truck, ArrowDownToLine, ArrowUpFromLine, SlidersHorizontal,
   ClipboardList, BookOpen, Users, Ruler, UserCircle, ChevronDown,
+  FileBarChart, ScrollText,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
@@ -41,6 +42,7 @@ export function Sidebar() {
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/items', icon: Package, label: 'Inventory Items' },
     { to: '/suppliers', icon: Truck, label: 'Suppliers' },
+    { to: '/reports', icon: FileBarChart, label: 'Reports' },
   ]
 
   const inventoryNav: NavItem[] = [
@@ -58,6 +60,7 @@ export function Sidebar() {
 
   const adminNav: NavItem[] = [
     { to: '/admin/users', icon: Users, label: 'Users' },
+    { to: '/admin/audit', icon: ScrollText, label: 'Audit Log' },
     { to: '/settings/units', icon: Ruler, label: 'Units of Measure' },
   ]
 

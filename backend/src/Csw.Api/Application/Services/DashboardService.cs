@@ -27,7 +27,16 @@ public class DashboardService(AppDbContext db)
         var totalTransactions = await db.InventoryTransactions.CountAsync(t => !t.IsVoided);
         var activeProductTypes = await db.ProductTypes.CountAsync(p => p.IsActive);
 
+        var today = DateTime.UtcNow.Date;
+        var todayReceipts = await db.InventoryTransactions.CountAsync(t =>
+            !t.IsVoided && t.TransactionType == TransactionType.Receipt
+            && t.TransactionDate == today);
+        var todayConsumptions = await db.InventoryTransactions.CountAsync(t =>
+            !t.IsVoided && t.TransactionType == TransactionType.Consumption
+            && t.TransactionDate == today);
+
         return new DashboardSummaryDto(totalItems, rawMaterials, accessories, packaging,
-            lowStock, outOfStock, totalTransactions, activeProductTypes);
+            lowStock, outOfStock, totalTransactions, activeProductTypes,
+            todayReceipts, todayConsumptions);
     }
 }

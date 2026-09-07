@@ -10,6 +10,8 @@ import { StockLedgerPage } from './pages/inventory/StockLedgerPage'
 import { StockBalancesPage } from './pages/inventory/StockBalancesPage'
 import { TransactionEntryPage } from './pages/inventory/TransactionEntryPage'
 import { UsersPage } from './pages/admin/UsersPage'
+import { AuditLogPage } from './pages/admin/AuditLogPage'
+import { ReportsPage } from './pages/reports/ReportsPage'
 import { UnitsPage } from './pages/settings/UnitsPage'
 import { ProfilePage } from './pages/settings/ProfilePage'
 import { NotFound } from './pages/NotFound'
@@ -37,8 +39,11 @@ export default function App() {
             <Route path="/inventory/consumption" element={<TransactionEntryPage mode="consumption" />} />
             <Route path="/inventory/adjustment" element={<TransactionEntryPage mode="adjustment" />} />
             <Route path="/inventory/opening-balance" element={<TransactionEntryPage mode="opening-balance" />} />
+            {/* Reports */}
+            <Route path="/reports" element={<ReportsPage />} />
             {/* Admin */}
             <Route path="/admin/users" element={<UsersPage />} />
+            <Route path="/admin/audit" element={<AuditLogPage />} />
             {/* Settings */}
             <Route path="/settings/units" element={<UnitsPage />} />
             <Route path="/settings/profile" element={<ProfilePage />} />

@@ -98,6 +98,8 @@ export interface DashboardSummary {
   outOfStockCount: number;
   totalTransactions: number;
   activeProductTypes: number;
+  todayReceipts: number;
+  todayConsumptions: number;
 }
 
 export interface Supplier {

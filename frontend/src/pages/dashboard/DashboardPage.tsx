@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Package, Layers, ShoppingBag, AlertTriangle, XCircle, ArrowUpDown, List } from 'lucide-react'
+import { Package, Layers, ShoppingBag, AlertTriangle, XCircle, ArrowUpDown, List, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react'
 import { dashboardApi } from '@/api/dashboard'
 import { formatNumber } from '@/lib/utils'
 
@@ -36,7 +36,7 @@ export function DashboardPage() {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 8 }).map((_, i) => (
+        {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 h-28 animate-pulse">
             <div className="flex gap-4">
               <div className="w-11 h-11 bg-gray-100 rounded-lg" />
@@ -62,6 +62,8 @@ export function DashboardPage() {
     { label: 'Out of Stock', value: data.outOfStockCount, icon: XCircle, color: 'text-red-600', bgColor: 'bg-red-50', sub: 'Zero quantity' },
     { label: 'Total Transactions', value: formatNumber(data.totalTransactions, 0), icon: ArrowUpDown, color: 'text-gray-600', bgColor: 'bg-gray-100', sub: 'All time' },
     { label: 'Product Types', value: data.activeProductTypes, icon: List, color: 'text-green-600', bgColor: 'bg-green-50', sub: 'Active categories' },
+    { label: "Today's Receipts", value: data.todayReceipts, icon: ArrowDownToLine, color: 'text-emerald-600', bgColor: 'bg-emerald-50', sub: 'Goods received today' },
+    { label: "Today's Consumptions", value: data.todayConsumptions, icon: ArrowUpFromLine, color: 'text-orange-600', bgColor: 'bg-orange-50', sub: 'Issued today' },
   ]
 
   return (

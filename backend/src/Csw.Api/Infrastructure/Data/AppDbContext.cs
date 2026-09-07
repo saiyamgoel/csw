@@ -14,6 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
     public DbSet<ProductType> ProductTypes => Set<ProductType>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -51,6 +52,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         // ProductType
         mb.Entity<ProductType>().HasIndex(p => p.Code).IsUnique();
+
+        // AuditEvent
+        mb.Entity<AuditEvent>().HasKey(a => a.Id);
+        mb.Entity<AuditEvent>().Property(a => a.Id).ValueGeneratedOnAdd();
 
         // Decimal precision
         foreach (var prop in mb.Model.GetEntityTypes()
