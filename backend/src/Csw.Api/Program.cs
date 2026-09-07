@@ -48,6 +48,10 @@ builder.Services.AddScoped<InventoryLedgerService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuditService>();
 builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<CharacteristicTypeService>();
+builder.Services.AddScoped<CodeGenerationService>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<BomService>();
 
 // MVC + Swagger
 builder.Services.AddControllers()

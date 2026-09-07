@@ -16,6 +16,22 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
 
+    // Item Coding
+    public DbSet<CharacteristicType> CharacteristicTypes => Set<CharacteristicType>();
+    public DbSet<CharacteristicValue> CharacteristicValues => Set<CharacteristicValue>();
+    public DbSet<CodeMaster> CodeMasters => Set<CodeMaster>();
+    public DbSet<CodeGenerationRule> CodeGenerationRules => Set<CodeGenerationRule>();
+
+    // Product Catalogue
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+    public DbSet<ProductVariantCharacteristic> ProductVariantCharacteristics => Set<ProductVariantCharacteristic>();
+
+    // BOM
+    public DbSet<BomHeader> BomHeaders => Set<BomHeader>();
+    public DbSet<BomVersion> BomVersions => Set<BomVersion>();
+    public DbSet<BomLine> BomLines => Set<BomLine>();
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         // UserRole join table
@@ -56,6 +72,76 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         // AuditEvent
         mb.Entity<AuditEvent>().HasKey(a => a.Id);
         mb.Entity<AuditEvent>().Property(a => a.Id).ValueGeneratedOnAdd();
+
+        // CharacteristicType
+        mb.Entity<CharacteristicType>().HasIndex(c => c.Code).IsUnique();
+
+        // CharacteristicValue
+        mb.Entity<CharacteristicValue>()
+            .HasOne(v => v.CharacteristicType).WithMany(t => t.Values)
+            .HasForeignKey(v => v.CharacteristicTypeId);
+        mb.Entity<CharacteristicValue>()
+            .HasIndex(v => new { v.CharacteristicTypeId, v.Code }).IsUnique();
+
+        // CodeMaster
+        mb.Entity<CodeMaster>().HasOne(cm => cm.Rule).WithOne(r => r.CodeMaster)
+            .HasForeignKey<CodeGenerationRule>(r => r.CodeMasterId);
+
+        // CodeGenerationRule
+        mb.Entity<CodeGenerationRule>()
+            .HasOne(r => r.CharacteristicType).WithMany(t => t.Rules)
+            .HasForeignKey(r => r.CharacteristicTypeId);
+
+        // Product
+        mb.Entity<Product>()
+            .HasOne(p => p.ProductType).WithMany()
+            .HasForeignKey(p => p.ProductTypeId);
+
+        // ProductVariant
+        mb.Entity<ProductVariant>().HasIndex(v => v.VariantCode).IsUnique();
+        mb.Entity<ProductVariant>()
+            .HasOne(v => v.Product).WithMany(p => p.Variants)
+            .HasForeignKey(v => v.ProductId);
+        mb.Entity<ProductVariant>()
+            .HasOne(v => v.Unit).WithMany()
+            .HasForeignKey(v => v.UnitId);
+
+        // ProductVariantCharacteristic
+        mb.Entity<ProductVariantCharacteristic>()
+            .HasOne(c => c.ProductVariant).WithMany(v => v.Characteristics)
+            .HasForeignKey(c => c.ProductVariantId);
+        mb.Entity<ProductVariantCharacteristic>()
+            .HasIndex(c => new { c.ProductVariantId, c.CharacteristicTypeId }).IsUnique();
+
+        // BomHeader
+        mb.Entity<BomHeader>()
+            .HasOne(h => h.ProductVariant).WithOne(v => v.BomHeader)
+            .HasForeignKey<BomHeader>(h => h.ProductVariantId);
+        mb.Entity<BomHeader>()
+            .HasOne(h => h.CurrentVersion).WithMany()
+            .HasForeignKey(h => h.CurrentVersionId)
+            .IsRequired(false);
+
+        // BomVersion
+        mb.Entity<BomVersion>().Property(v => v.Status).HasConversion<string>();
+        mb.Entity<BomVersion>()
+            .HasOne(v => v.BomHeader).WithMany(h => h.Versions)
+            .HasForeignKey(v => v.BomHeaderId);
+        mb.Entity<BomVersion>()
+            .HasIndex(v => new { v.BomHeaderId, v.VersionNumber }).IsUnique();
+
+        // BomLine
+        mb.Entity<BomLine>()
+            .HasOne(l => l.BomVersion).WithMany(v => v.Lines)
+            .HasForeignKey(l => l.BomVersionId);
+        mb.Entity<BomLine>()
+            .HasOne(l => l.Item).WithMany()
+            .HasForeignKey(l => l.ItemId);
+        mb.Entity<BomLine>()
+            .HasOne(l => l.Unit).WithMany()
+            .HasForeignKey(l => l.UnitId);
+        mb.Entity<BomLine>()
+            .HasIndex(l => new { l.BomVersionId, l.LineNumber }).IsUnique();
 
         // Decimal precision
         foreach (var prop in mb.Model.GetEntityTypes()

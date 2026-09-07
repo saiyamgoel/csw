@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Package, ShoppingBag, List, LogOut,
   Truck, ArrowDownToLine, ArrowUpFromLine, SlidersHorizontal,
   ClipboardList, BookOpen, Users, Ruler, UserCircle, ChevronDown,
-  FileBarChart, ScrollText,
+  FileBarChart, ScrollText, Tag, Wand2, GitBranch, Layers,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
@@ -56,6 +56,12 @@ export function Sidebar() {
   const productsNav: NavItem[] = [
     { to: '/product-types', icon: List, label: 'Product Types' },
     { to: '/products', icon: ShoppingBag, label: 'Products' },
+    { to: '/bom', icon: GitBranch, label: 'Bill of Materials' },
+  ]
+
+  const itemCodingNav: NavItem[] = [
+    { to: '/settings/characteristic-types', icon: Tag, label: 'Characteristic Types' },
+    { to: '/settings/code-generator', icon: Wand2, label: 'Code Generator' },
   ]
 
   const adminNav: NavItem[] = [
@@ -75,6 +81,7 @@ export function Sidebar() {
         <NavSection title="Main" items={mainNav} />
         <NavSection title="Inventory" items={inventoryNav} />
         <NavSection title="Products" items={productsNav} />
+        {isAdmin && <NavSection title="Item Coding" items={itemCodingNav} />}
         {isAdmin && <NavSection title="Admin" items={adminNav} />}
       </nav>
 

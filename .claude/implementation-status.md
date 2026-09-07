@@ -16,7 +16,6 @@
 - [x] `GET /health/live` endpoint
 - [ ] EF Core formal migrations (currently using EnsureCreated)
 - [ ] Hangfire background jobs
-- [ ] Audit middleware / AuditEvent capture
 
 ### Domain Entities
 - [x] User, Role, UserRole
@@ -25,11 +24,11 @@
 - [x] InventoryBalance, InventoryTransaction
 - [x] ProductType
 - [x] Supplier
-- [ ] CharacteristicType, CharacteristicValue
-- [ ] CodeMaster, CodeGenerationRule
-- [ ] Product, ProductVariant, ProductVariantCharacteristic
-- [ ] BomHeader, BomVersion, BomLine
-- [ ] AuditEvent
+- [x] AuditEvent
+- [x] CharacteristicType, CharacteristicValue
+- [x] CodeMaster, CodeGenerationRule
+- [x] Product, ProductVariant, ProductVariantCharacteristic
+- [x] BomHeader, BomVersion, BomLine
 - [ ] StockReservation
 - [ ] ReorderPolicy
 
@@ -41,13 +40,12 @@
 - [x] `SuppliersController` — GET/POST/PUT/DELETE /api/v1/suppliers
 - [x] `UsersController` — GET/POST/PUT /api/v1/users, role assign/remove, change password
 - [x] `InventoryController` — GET balances, GET transactions (ledger), POST receipt/consumption/adjustment/opening-balance, POST void
-- [ ] Characteristic Types & Values CRUD
-- [ ] Code Masters & Rules CRUD + code generation preview
-- [ ] Products CRUD
-- [ ] Product Variants CRUD (with code generation)
-- [ ] BOM CRUD (headers, versions, lines, activate workflow)
+- [x] `ReportsController` — current inventory CSV, low stock CSV, stock movement CSV, audit log
+- [x] `CharacteristicTypesController` — GET/POST/PUT /api/v1/characteristic-types + values CRUD
+- [x] `CodeMastersController` — GET/POST/PUT /api/v1/code-masters + POST /api/v1/generate-code
+- [x] `ProductsController` — GET/POST/PUT /api/v1/products + GET/POST/PUT /api/v1/products/variants
+- [x] `BomController` — GET/POST /api/v1/boms, versions CRUD, lines CRUD, activate workflow
 - [ ] Availability Check
-- [ ] Reports (current inventory, low stock, stock movement)
 - [ ] Reorder Policies
 
 ---
@@ -64,7 +62,7 @@
 
 ### Pages
 - [x] Login page (`/login`)
-- [x] Dashboard (`/dashboard`) — KPI cards (total items, low/in-stock counts)
+- [x] Dashboard (`/dashboard`) — KPI cards + today's receipt/consumption counts
 - [x] Items list (`/items`) — paginated table, category filter, create/edit/deactivate
 - [x] Product Types (`/product-types`) — create/edit/deactivate
 - [x] Suppliers (`/suppliers`) — paginated, create/edit/deactivate
@@ -74,18 +72,20 @@
 - [x] Consumption (`/inventory/consumption`) — post consumption form
 - [x] Stock Adjustment (`/inventory/adjustment`) — positive/negative adjustment
 - [x] Opening Balance (`/inventory/opening-balance`) — one-time per item
-- [x] User Management (`/admin/users`) — create/edit users, role display (Admin)
+- [x] User Management (`/admin/users`) — create/edit users, role assignment (Admin)
+- [x] Audit Log (`/admin/audit`) — paginated events, action/user/date filters (Admin)
+- [x] Reports (`/reports`) — current inventory, low stock, stock movement with CSV export
 - [x] Units of Measure (`/settings/units`) — create/edit units (Admin)
 - [x] Profile (`/settings/profile`) — view info + change password
-- [ ] Characteristic Types + Values pages
-- [ ] Code Generator preview page
-- [ ] Products list + form
-- [ ] Product Variants form (characteristic picker → live code preview → save)
-- [ ] BOM editor (version selector, line editor, activate workflow)
-- [ ] BOM version diff view
+- [x] Characteristic Types (`/settings/characteristic-types`) — type accordion + values grid, CRUD (Admin)
+- [x] Code Generator (`/settings/code-generator`) — segment config + interactive code preview (Admin)
+- [x] Products list (`/products`) — paginated, type filter, create/edit
+- [x] Product Variants (`/products/:productId/variants`) — variant list, characteristic picker, live code preview, create
+- [x] BOM List (`/bom`) — headers with variant code and status
+- [x] BOM Detail (`/bom/:bomId`) — version selector, line editor, activate workflow
+- [x] BOM New (`/bom/new`) — create header with variant picker
 - [ ] Availability Check page
-- [ ] Reports (current inventory, low stock, stock movement)
-- [ ] Audit Log (Admin)
+- [ ] BOM version diff view
 
 ---
 
@@ -95,6 +95,8 @@
 - 7 units of measure: KG, G, PCS, MTR, LTR, SET, BOX
 - 6 product types: Sauce Pan, Kadai, Fry Pan, Casserole, Pressure Cooker, Wok
 - 9 items with opening inventory balances
+- 6 characteristic types: PRODUCT_TYPE, MATERIAL, SIZE, HANDLE_TYPE, FINISH, LID_TYPE (with values)
+- 6 code master segments + 6 generation rules
 
 ---
 
@@ -102,6 +104,6 @@
 
 | Phase | Scope | Status |
 |---|---|---|
-| Phase 1 | Core foundation: auth, items, product types, dashboard | ~90% done (reports, audit log missing) |
-| Phase 2 | BOM + Product Catalogue + Availability Check | Not started |
+| Phase 1 | Core foundation: auth, items, product types, inventory, dashboard, reports | **Complete** |
+| Phase 2 | BOM + Product Catalogue + Item Coding | ~80% done (Availability Check remaining) |
 | Phase 3 | Replenishment, advanced reports, bulk import, integrations | Not started |

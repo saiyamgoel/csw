@@ -82,6 +82,86 @@ public static class DbInitializer
             await db.SaveChangesAsync();
         }
 
+        // Characteristic Types & Values
+        if (!await db.CharacteristicTypes.AnyAsync())
+        {
+            var ptId = Guid.Parse("50000000-0000-0000-0000-000000000001");
+            var matId = Guid.Parse("50000000-0000-0000-0000-000000000002");
+            var sizeId = Guid.Parse("50000000-0000-0000-0000-000000000003");
+            var handleId = Guid.Parse("50000000-0000-0000-0000-000000000004");
+            var finishId = Guid.Parse("50000000-0000-0000-0000-000000000005");
+            var lidId = Guid.Parse("50000000-0000-0000-0000-000000000006");
+
+            var ctypes = new[]
+            {
+                new CharacteristicType { Id = ptId, Code = "PRODUCT_TYPE", Name = "Product Type", SortOrder = 1 },
+                new CharacteristicType { Id = matId, Code = "MATERIAL", Name = "Material", SortOrder = 2 },
+                new CharacteristicType { Id = sizeId, Code = "SIZE", Name = "Size (cm)", SortOrder = 3 },
+                new CharacteristicType { Id = handleId, Code = "HANDLE_TYPE", Name = "Handle Type", SortOrder = 4 },
+                new CharacteristicType { Id = finishId, Code = "FINISH", Name = "Finish", SortOrder = 5 },
+                new CharacteristicType { Id = lidId, Code = "LID_TYPE", Name = "Lid Type", SortOrder = 6, Description = "Optional" },
+            };
+            db.CharacteristicTypes.AddRange(ctypes);
+            await db.SaveChangesAsync();
+
+            db.CharacteristicValues.AddRange(
+                // Product Types
+                new CharacteristicValue { CharacteristicTypeId = ptId, Code = "SAUCE", Name = "Sauce Pan", SortOrder = 1 },
+                new CharacteristicValue { CharacteristicTypeId = ptId, Code = "KAD", Name = "Kadai", SortOrder = 2 },
+                new CharacteristicValue { CharacteristicTypeId = ptId, Code = "FRY", Name = "Fry Pan", SortOrder = 3 },
+                new CharacteristicValue { CharacteristicTypeId = ptId, Code = "CAS", Name = "Casserole", SortOrder = 4 },
+                new CharacteristicValue { CharacteristicTypeId = ptId, Code = "TOPE", Name = "Tope", SortOrder = 5 },
+                // Materials
+                new CharacteristicValue { CharacteristicTypeId = matId, Code = "TRI", Name = "Triply", SortOrder = 1 },
+                new CharacteristicValue { CharacteristicTypeId = matId, Code = "SS", Name = "Stainless Steel", SortOrder = 2 },
+                new CharacteristicValue { CharacteristicTypeId = matId, Code = "ALU", Name = "Aluminium", SortOrder = 3 },
+                // Sizes
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "14", Name = "14 cm", SortOrder = 1 },
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "16", Name = "16 cm", SortOrder = 2 },
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "18", Name = "18 cm", SortOrder = 3 },
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "20", Name = "20 cm", SortOrder = 4 },
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "22", Name = "22 cm", SortOrder = 5 },
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "24", Name = "24 cm", SortOrder = 6 },
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "26", Name = "26 cm", SortOrder = 7 },
+                new CharacteristicValue { CharacteristicTypeId = sizeId, Code = "28", Name = "28 cm", SortOrder = 8 },
+                // Handle Types
+                new CharacteristicValue { CharacteristicTypeId = handleId, Code = "DCL7", Name = "Die Cast Long 7\"", SortOrder = 1 },
+                new CharacteristicValue { CharacteristicTypeId = handleId, Code = "MWH", Name = "Medium Wire Handle", SortOrder = 2 },
+                new CharacteristicValue { CharacteristicTypeId = handleId, Code = "SSH", Name = "SS Handle", SortOrder = 3 },
+                new CharacteristicValue { CharacteristicTypeId = handleId, Code = "DH2", Name = "Double Handle", SortOrder = 4 },
+                // Finish
+                new CharacteristicValue { CharacteristicTypeId = finishId, Code = "MIR", Name = "Mirror Polish", SortOrder = 1 },
+                new CharacteristicValue { CharacteristicTypeId = finishId, Code = "MAT", Name = "Matt Finish", SortOrder = 2 },
+                new CharacteristicValue { CharacteristicTypeId = finishId, Code = "BLK", Name = "Black Coated", SortOrder = 3 },
+                // Lid Types
+                new CharacteristicValue { CharacteristicTypeId = lidId, Code = "BC", Name = "Black Cool Lid", SortOrder = 1 },
+                new CharacteristicValue { CharacteristicTypeId = lidId, Code = "GL", Name = "Glass Lid", SortOrder = 2 },
+                new CharacteristicValue { CharacteristicTypeId = lidId, Code = "SSL", Name = "SS Lid", SortOrder = 3 },
+                new CharacteristicValue { CharacteristicTypeId = lidId, Code = "NL", Name = "No Lid", SortOrder = 4 }
+            );
+            await db.SaveChangesAsync();
+
+            // Code Masters + Rules
+            var cmPt = new CodeMaster { Id = Guid.Parse("60000000-0000-0000-0000-000000000001"), SegmentName = "ProductType", SegmentOrder = 1, Separator = "" };
+            var cmMat = new CodeMaster { Id = Guid.Parse("60000000-0000-0000-0000-000000000002"), SegmentName = "Material", SegmentOrder = 2, Separator = "-" };
+            var cmSz = new CodeMaster { Id = Guid.Parse("60000000-0000-0000-0000-000000000003"), SegmentName = "Size", SegmentOrder = 3, Separator = "-" };
+            var cmHdl = new CodeMaster { Id = Guid.Parse("60000000-0000-0000-0000-000000000004"), SegmentName = "HandleType", SegmentOrder = 4, Separator = "-" };
+            var cmFin = new CodeMaster { Id = Guid.Parse("60000000-0000-0000-0000-000000000005"), SegmentName = "Finish", SegmentOrder = 5, Separator = "-" };
+            var cmLid = new CodeMaster { Id = Guid.Parse("60000000-0000-0000-0000-000000000006"), SegmentName = "LidType", SegmentOrder = 6, Separator = "-", IsOptional = true };
+            db.CodeMasters.AddRange(cmPt, cmMat, cmSz, cmHdl, cmFin, cmLid);
+            await db.SaveChangesAsync();
+
+            db.CodeGenerationRules.AddRange(
+                new CodeGenerationRule { CodeMasterId = cmPt.Id, CharacteristicTypeId = ptId },
+                new CodeGenerationRule { CodeMasterId = cmMat.Id, CharacteristicTypeId = matId },
+                new CodeGenerationRule { CodeMasterId = cmSz.Id, CharacteristicTypeId = sizeId },
+                new CodeGenerationRule { CodeMasterId = cmHdl.Id, CharacteristicTypeId = handleId },
+                new CodeGenerationRule { CodeMasterId = cmFin.Id, CharacteristicTypeId = finishId },
+                new CodeGenerationRule { CodeMasterId = cmLid.Id, CharacteristicTypeId = lidId }
+            );
+            await db.SaveChangesAsync();
+        }
+
         // Sample Items
         if (!await db.Items.AnyAsync())
         {
