@@ -99,3 +99,84 @@ export interface DashboardSummary {
   totalTransactions: number;
   activeProductTypes: number;
 }
+
+export interface Supplier {
+  id: string;
+  name: string;
+  contactName: string | null;
+  phone: string | null;
+  email: string | null;
+  notes: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface SupplierCreateRequest {
+  name: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
+}
+
+export interface SupplierUpdateRequest {
+  name: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
+  isActive: boolean;
+}
+
+export type TransactionType =
+  | 'Opening Balance'
+  | 'Receipt'
+  | 'Consumption'
+  | 'Positive Adjustment'
+  | 'Negative Adjustment';
+
+export interface InventoryBalance {
+  itemId: string;
+  itemCode: string;
+  itemName: string;
+  category: ItemCategory;
+  unitName: string;
+  unitAbbreviation: string;
+  quantityOnHand: number;
+  quantityReserved: number;
+  quantityAvailable: number;
+  stockStatus: StockStatus;
+  minimumStockLevel: number;
+  reorderLevel: number;
+}
+
+export interface InventoryTransaction {
+  id: string;
+  itemId: string;
+  itemCode: string;
+  itemName: string;
+  transactionType: string;
+  quantity: number;
+  sign: number;
+  reference: string | null;
+  notes: string | null;
+  transactionDate: string;
+  postedAt: string;
+  postedByName: string;
+  isVoided: boolean;
+}
+
+export interface AppUser {
+  id: string;
+  email: string;
+  fullName: string;
+  roles: string[];
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+}

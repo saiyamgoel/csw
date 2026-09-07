@@ -12,8 +12,21 @@ namespace Csw.Api.Controllers;
 public class ItemsController(ItemService itemService) : ControllerBase
 {
     [HttpGet("units")]
-    public async Task<IActionResult> GetUnits() =>
-        Ok(await itemService.GetUnitsAsync());
+    public async Task<IActionResult> GetUnits([FromQuery] bool all = false) =>
+        Ok(all ? await itemService.GetAllUnitsAsync() : await itemService.GetUnitsAsync());
+
+    [HttpPost("units")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> CreateUnit([FromBody] UnitCreateRequest req)
+        => Ok(await itemService.CreateUnitAsync(req));
+
+    [HttpPut("units/{id:guid}")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> UpdateUnit(Guid id, [FromBody] UnitUpdateRequest req)
+    {
+        var u = await itemService.UpdateUnitAsync(id, req);
+        return u == null ? NotFound() : Ok(u);
+    }
 
     [HttpGet("items")]
     public async Task<IActionResult> GetItems(

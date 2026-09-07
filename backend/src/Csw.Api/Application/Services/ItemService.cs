@@ -127,6 +127,32 @@ public class ItemService(AppDbContext db)
     public async Task<List<UnitDto>> GetUnitsAsync() =>
         await db.Units.Where(u => u.IsActive)
             .OrderBy(u => u.Name)
-            .Select(u => new UnitDto(u.Id, u.Name, u.Abbreviation))
+            .Select(u => new UnitDto(u.Id, u.Name, u.Abbreviation, u.IsActive))
             .ToListAsync();
+
+    public async Task<List<UnitDto>> GetAllUnitsAsync() =>
+        await db.Units.OrderBy(u => u.Name)
+            .Select(u => new UnitDto(u.Id, u.Name, u.Abbreviation, u.IsActive))
+            .ToListAsync();
+
+    public async Task<UnitDto> CreateUnitAsync(UnitCreateRequest req)
+    {
+        if (await db.Units.AnyAsync(u => u.Abbreviation == req.Abbreviation.ToUpper().Trim()))
+            throw new InvalidOperationException($"Unit '{req.Abbreviation}' already exists.");
+        var u = new Unit { Name = req.Name.Trim(), Abbreviation = req.Abbreviation.ToUpper().Trim() };
+        db.Units.Add(u);
+        await db.SaveChangesAsync();
+        return new UnitDto(u.Id, u.Name, u.Abbreviation, u.IsActive);
+    }
+
+    public async Task<UnitDto?> UpdateUnitAsync(Guid id, UnitUpdateRequest req)
+    {
+        var u = await db.Units.FindAsync(id);
+        if (u == null) return null;
+        u.Name = req.Name.Trim();
+        u.Abbreviation = req.Abbreviation.ToUpper().Trim();
+        u.IsActive = req.IsActive;
+        await db.SaveChangesAsync();
+        return new UnitDto(u.Id, u.Name, u.Abbreviation, u.IsActive);
+    }
 }

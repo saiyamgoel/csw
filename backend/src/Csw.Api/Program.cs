@@ -43,6 +43,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<ProductTypeService>();
 builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<SupplierService>();
+builder.Services.AddScoped<InventoryLedgerService>();
+builder.Services.AddScoped<UserService>();
 
 // MVC + Swagger
 builder.Services.AddControllers()

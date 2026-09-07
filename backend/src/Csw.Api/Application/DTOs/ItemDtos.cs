@@ -1,6 +1,8 @@
 namespace Csw.Api.Application.DTOs;
 
-public record UnitDto(Guid Id, string Name, string Abbreviation);
+public record UnitDto(Guid Id, string Name, string Abbreviation, bool IsActive);
+public record UnitCreateRequest(string Name, string Abbreviation);
+public record UnitUpdateRequest(string Name, string Abbreviation, bool IsActive);
 
 public record ItemDto(
     Guid Id,

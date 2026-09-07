@@ -20,7 +20,7 @@ export function ItemFormModal({ open, onClose, item }: Props) {
   const qc = useQueryClient()
   const isEdit = !!item
 
-  const { data: units = [] } = useQuery({ queryKey: ['units'], queryFn: itemsApi.getUnits })
+  const { data: units = [] } = useQuery<import('@/types').Unit[]>({ queryKey: ['units'], queryFn: () => itemsApi.getUnits() })
 
   const [form, setForm] = useState({
     code: '', name: '', category: 'RAW_MATERIAL' as ItemCategory,

@@ -35,17 +35,17 @@
 
 ### API Controllers / Services
 - [x] `AuthController` — POST /api/v1/auth/login, GET /api/v1/auth/me
-- [x] `ItemsController` — GET/POST/PUT/DELETE /api/v1/items, GET /api/v1/units
+- [x] `ItemsController` — GET/POST/PUT/DELETE /api/v1/items, GET/POST/PUT /api/v1/units
 - [x] `ProductTypesController` — GET/POST/PUT/DELETE /api/v1/product-types
 - [x] `DashboardController` — GET /api/v1/dashboard/summary
-- [ ] Suppliers CRUD
-- [ ] Users & Roles management (Admin)
+- [x] `SuppliersController` — GET/POST/PUT/DELETE /api/v1/suppliers
+- [x] `UsersController` — GET/POST/PUT /api/v1/users, role assign/remove, change password
+- [x] `InventoryController` — GET balances, GET transactions (ledger), POST receipt/consumption/adjustment/opening-balance, POST void
 - [ ] Characteristic Types & Values CRUD
 - [ ] Code Masters & Rules CRUD + code generation preview
 - [ ] Products CRUD
 - [ ] Product Variants CRUD (with code generation)
 - [ ] BOM CRUD (headers, versions, lines, activate workflow)
-- [ ] Inventory Ledger (receipt, consumption, adjustment, opening balance, void)
 - [ ] Availability Check
 - [ ] Reports (current inventory, low stock, stock movement)
 - [ ] Reorder Policies
@@ -67,22 +67,25 @@
 - [x] Dashboard (`/dashboard`) — KPI cards (total items, low/in-stock counts)
 - [x] Items list (`/items`) — paginated table, category filter, create/edit/deactivate
 - [x] Product Types (`/product-types`) — create/edit/deactivate
-- [ ] Suppliers list + form
+- [x] Suppliers (`/suppliers`) — paginated, create/edit/deactivate
+- [x] Stock Balances (`/inventory/stock`) — live balance table with low-stock filter
+- [x] Stock Ledger (`/inventory/ledger`) — full transaction history, filterable, void
+- [x] Goods Receipt (`/inventory/receipt`) — post receipt form
+- [x] Consumption (`/inventory/consumption`) — post consumption form
+- [x] Stock Adjustment (`/inventory/adjustment`) — positive/negative adjustment
+- [x] Opening Balance (`/inventory/opening-balance`) — one-time per item
+- [x] User Management (`/admin/users`) — create/edit users, role display (Admin)
+- [x] Units of Measure (`/settings/units`) — create/edit units (Admin)
+- [x] Profile (`/settings/profile`) — view info + change password
 - [ ] Characteristic Types + Values pages
 - [ ] Code Generator preview page
 - [ ] Products list + form
 - [ ] Product Variants form (characteristic picker → live code preview → save)
 - [ ] BOM editor (version selector, line editor, activate workflow)
 - [ ] BOM version diff view
-- [ ] Stock Ledger view
-- [ ] Receipt / Consumption / Adjustment entry forms
-- [ ] Opening Balance entry
 - [ ] Availability Check page
 - [ ] Reports (current inventory, low stock, stock movement)
-- [ ] User management + role assignment (Admin)
 - [ ] Audit Log (Admin)
-- [ ] Units of Measure CRUD
-- [ ] Profile + password change
 
 ---
 
@@ -99,6 +102,6 @@
 
 | Phase | Scope | Status |
 |---|---|---|
-| Phase 1 | Core foundation: auth, items, product types, dashboard | ~60% done (inventory ledger, suppliers, users, reports missing) |
+| Phase 1 | Core foundation: auth, items, product types, dashboard | ~90% done (reports, audit log missing) |
 | Phase 2 | BOM + Product Catalogue + Availability Check | Not started |
 | Phase 3 | Replenishment, advanced reports, bulk import, integrations | Not started |
